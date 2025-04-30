@@ -1,15 +1,15 @@
 import { Model, DataTypes } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 export default (sequelize) => {
-    class Product extends Model {
+    class User extends Model {
         static associate(models) {
-            Product.belongsTo(models.Category, {
-                foreignKey: "categoryId",
-                as: "category",
+            User.hasMany(models.Cart, {
+                foreignKey: "userId",
+                as: "carts",
             });
         }
     }
-    Product.init({
+    User.init({
         id: {
             type: DataTypes.UUID,
             primaryKey: true,
@@ -20,23 +20,26 @@ export default (sequelize) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        price: {
-            type: DataTypes.FLOAT,
+        username: {
+            type: DataTypes.STRING,
             allowNull: false,
+            unique: true,
         },
-        categoryId: {
-            type: DataTypes.UUID,
+        email: {
+            type: DataTypes.STRING,
             allowNull: false,
-            references: {
-                model: "categories", // must match your table name
-                key: "id",
+            unique: true,
+            validate: {
+                isEmail: true,
             },
-            onUpdate: "CASCADE",
-            onDelete: "RESTRICT",
         },
-        stock: {
-            type: DataTypes.INTEGER,
+        password: {
+            type: DataTypes.STRING,
             allowNull: false,
+        },
+        telephone: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         createdAt: {
             type: DataTypes.DATE,
@@ -50,8 +53,8 @@ export default (sequelize) => {
         },
     }, {
         sequelize,
-        modelName: "Product",
-        tableName: "products",
+        modelName: "User",
+        tableName: "users",
     });
-    return Product;
+    return User;
 };

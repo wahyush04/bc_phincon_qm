@@ -1,21 +1,17 @@
 import AbstractModel from "../abstracts/model.abstract.js";
 import db from "../models/index.js";
 import { v4 as uuidv4 } from "uuid";
-class ProductController extends AbstractModel {
+import bcrypt from "bcrypt";
+class UserController extends AbstractModel {
     async getAll(req, res) {
         try {
-            const products = await db.Product.findAll({
-                attributes: ["id", "name", "price", "stock"],
-                include: {
-                    model: db.Category,
-                    as: "category",
-                    attributes: ["id", "title"],
-                },
+            const users = await db.User.findAll({
+                attributes: ["id", "name", "username", "email", "telephone", "createdAt", "updatedAt"],
             });
             res.json({
                 status: "success",
-                message: "Products fetched successfully",
-                data: products,
+                message: "Users fetched successfully",
+                data: users,
             });
         }
         catch (error) {
@@ -27,25 +23,20 @@ class ProductController extends AbstractModel {
     }
     async getById(req, res) {
         try {
-            const product = await db.Product.findByPk(req.params.id, {
-                attributes: ["id", "name", "price", "stock"],
-                include: {
-                    model: db.Category,
-                    as: "category",
-                    attributes: ["id", "title"],
-                },
+            const user = await db.User.findByPk(req.params.id, {
+                attributes: ["id", "name", "username", "email", "teleohone", "createdAt", "updatedAt"],
             });
-            if (!product) {
+            if (!user) {
                 res.json({
-                    message: "Product not found",
+                    message: "User not found",
                     status: "error",
                 });
                 return;
             }
             res.json({
                 status: "success",
-                message: "Product fetched successfully",
-                data: product,
+                message: "User fetched successfully",
+                data: user,
             });
         }
         catch (error) {
@@ -58,18 +49,27 @@ class ProductController extends AbstractModel {
     async create(req, res) {
         try {
             const id = req.body.id || uuidv4();
-            const product = await db.Product.create({
+            const hashedPassword = await bcrypt.hash(req.body.password, 10);
+            const user = await db.User.create({
                 ...req.body,
                 id,
+                password: hashedPassword,
             });
             res.json({
                 status: "success",
-                message: "Product created successfully",
-                data: product,
+                message: "User created successfully",
+                data: {
+                    id: user.id,
+                    name: user.name,
+                    username: user.username,
+                    email: user.email,
+                    teleohone: user.teleohone,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt,
+                },
             });
         }
         catch (error) {
-            console.log(error);
             res.json({
                 status: "error",
                 message: error.message,
@@ -79,17 +79,21 @@ class ProductController extends AbstractModel {
     async update(req, res) {
         try {
             const { id } = req.params;
-            const [updated] = await db.Product.update(req.body, { where: { id } });
+            const payload = { ...req.body };
+            if (payload.password) {
+                payload.password = await bcrypt.hash(payload.password, 10);
+            }
+            const [updated] = await db.User.update(payload, { where: { id } });
             if (!updated) {
                 res.json({
                     status: "error",
-                    message: "Product not found or no changes applied",
+                    message: "User not found or no changes applied",
                 });
                 return;
             }
             res.json({
                 status: "success",
-                message: "Product updated successfully",
+                message: "User updated successfully",
             });
         }
         catch (error) {
@@ -102,17 +106,17 @@ class ProductController extends AbstractModel {
     async delete(req, res) {
         try {
             const { id } = req.params;
-            const deleted = await db.Product.destroy({ where: { id } });
+            const deleted = await db.User.destroy({ where: { id } });
             if (!deleted) {
                 res.json({
                     status: "error",
-                    message: "Product not found",
+                    message: "User not found",
                 });
                 return;
             }
             res.json({
                 status: "success",
-                message: "Product deleted successfully",
+                message: "User deleted successfully",
                 data: id,
             });
         }
@@ -124,4 +128,4 @@ class ProductController extends AbstractModel {
         }
     }
 }
-export default new ProductController();
+export default new UserController();

@@ -1,21 +1,16 @@
 import AbstractModel from "../abstracts/model.abstract.js";
 import db from "../models/index.js";
 import { v4 as uuidv4 } from "uuid";
-class ProductController extends AbstractModel {
+class CategoryController extends AbstractModel {
     async getAll(req, res) {
         try {
-            const products = await db.Product.findAll({
-                attributes: ["id", "name", "price", "stock"],
-                include: {
-                    model: db.Category,
-                    as: "category",
-                    attributes: ["id", "title"],
-                },
+            const categories = await db.Category.findAll({
+                attributes: ["id", "title", "description", "createdAt", "updatedAt"],
             });
             res.json({
                 status: "success",
-                message: "Products fetched successfully",
-                data: products,
+                message: "Categories fetched successfully",
+                data: categories,
             });
         }
         catch (error) {
@@ -27,25 +22,20 @@ class ProductController extends AbstractModel {
     }
     async getById(req, res) {
         try {
-            const product = await db.Product.findByPk(req.params.id, {
-                attributes: ["id", "name", "price", "stock"],
-                include: {
-                    model: db.Category,
-                    as: "category",
-                    attributes: ["id", "title"],
-                },
+            const category = await db.Category.findByPk(req.params.id, {
+                attributes: ["id", "title", "description", "createdAt", "updatedAt"],
             });
-            if (!product) {
+            if (!category) {
                 res.json({
-                    message: "Product not found",
+                    message: "Category not found",
                     status: "error",
                 });
                 return;
             }
             res.json({
                 status: "success",
-                message: "Product fetched successfully",
-                data: product,
+                message: "Category fetched successfully",
+                data: category,
             });
         }
         catch (error) {
@@ -58,18 +48,23 @@ class ProductController extends AbstractModel {
     async create(req, res) {
         try {
             const id = req.body.id || uuidv4();
-            const product = await db.Product.create({
+            const category = await db.Category.create({
                 ...req.body,
                 id,
             });
             res.json({
                 status: "success",
-                message: "Product created successfully",
-                data: product,
+                message: "Category created successfully",
+                data: {
+                    id: category.id,
+                    title: category.title,
+                    description: category.description,
+                    createdAt: category.createdAt,
+                    updatedAt: category.updatedAt,
+                },
             });
         }
         catch (error) {
-            console.log(error);
             res.json({
                 status: "error",
                 message: error.message,
@@ -79,17 +74,17 @@ class ProductController extends AbstractModel {
     async update(req, res) {
         try {
             const { id } = req.params;
-            const [updated] = await db.Product.update(req.body, { where: { id } });
+            const [updated] = await db.Category.update(req.body, { where: { id } });
             if (!updated) {
                 res.json({
                     status: "error",
-                    message: "Product not found or no changes applied",
+                    message: "Category not found or no changes applied",
                 });
                 return;
             }
             res.json({
                 status: "success",
-                message: "Product updated successfully",
+                message: "Category updated successfully",
             });
         }
         catch (error) {
@@ -102,17 +97,17 @@ class ProductController extends AbstractModel {
     async delete(req, res) {
         try {
             const { id } = req.params;
-            const deleted = await db.Product.destroy({ where: { id } });
+            const deleted = await db.Category.destroy({ where: { id } });
             if (!deleted) {
                 res.json({
                     status: "error",
-                    message: "Product not found",
+                    message: "Category not found",
                 });
                 return;
             }
             res.json({
                 status: "success",
-                message: "Product deleted successfully",
+                message: "Category deleted successfully",
                 data: id,
             });
         }
@@ -124,4 +119,4 @@ class ProductController extends AbstractModel {
         }
     }
 }
-export default new ProductController();
+export default new CategoryController();

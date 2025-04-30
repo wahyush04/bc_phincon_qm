@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 export default {
     up: async (queryInterface) => {
-        await queryInterface.createTable("products", {
+        await queryInterface.createTable("users", {
             id: {
                 type: DataTypes.UUID,
                 defaultValue: DataTypes.UUIDV4,
@@ -12,17 +12,23 @@ export default {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            price: {
-                type: DataTypes.FLOAT,
+            username: {
+                type: DataTypes.STRING,
                 allowNull: false,
+                unique: true,
             },
-            category: {
+            email: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                unique: true,
+            },
+            password: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            stock: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
+            teleohone: {
+                type: DataTypes.STRING,
+                allowNull: true,
             },
             createdAt: {
                 type: DataTypes.DATE,
@@ -37,6 +43,6 @@ export default {
         });
     },
     down: async (queryInterface) => {
-        await queryInterface.dropTable("products");
+        await queryInterface.dropTable("users");
     },
 };

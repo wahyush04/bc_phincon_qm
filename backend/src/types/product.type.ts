@@ -1,8 +1,8 @@
 export interface ProductModel {
-    id: number;
+    id: string;
     name: string;
     price: number;
-    category: string;
+    categoryId: string;
     stock: number;
     createdAt: Date;
     updatedAt: Date;

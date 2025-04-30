@@ -1,18 +1,23 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
-import { ProductModel } from "../types/product.type.js";
+import { CartModel } from "../types/cart.type.js";
 import { v4 as uuidv4 } from "uuid";
 
 export default (sequelize: Sequelize) => {
-    class Product extends Model<ProductModel> {
+    class Cart extends Model<CartModel> {
         static associate(models: any) {
-            Product.belongsTo(models.Category, {
-                foreignKey: "categoryId",
-                as: "category",
+            Cart.belongsTo(models.User, {
+                foreignKey: "userId",
+                as: "user",
+            });
+
+            Cart.belongsTo(models.Product, {
+                foreignKey: "productId",
+                as: "product",
             });
         }
     }
 
-    Product.init(
+    Cart.init(
         {
             id: {
                 type: DataTypes.UUID,
@@ -20,26 +25,32 @@ export default (sequelize: Sequelize) => {
                 allowNull: false,
                 defaultValue: uuidv4,
             },
-            name: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            price: {
-                type: DataTypes.FLOAT,
-                allowNull: false,
-            },
-            categoryId: {
+            userId: {
                 type: DataTypes.UUID,
                 allowNull: false,
                 references: {
-                    model: "categories", // must match your table name
+                    model: "users",
                     key: "id",
                 },
                 onUpdate: "CASCADE",
-                onDelete: "RESTRICT",
+                onDelete: "CASCADE",
             },
-            stock: {
+            productId: {
+                type: DataTypes.UUID,
+                allowNull: false,
+                references: {
+                    model: "products",
+                    key: "id",
+                },
+                onUpdate: "CASCADE",
+                onDelete: "CASCADE",
+            },
+            qty: {
                 type: DataTypes.INTEGER,
+                allowNull: false,
+            },
+            totalPrice: {
+                type: DataTypes.FLOAT,
                 allowNull: false,
             },
             createdAt: {
@@ -55,10 +66,10 @@ export default (sequelize: Sequelize) => {
         },
         {
             sequelize,
-            modelName: "Product",
-            tableName: "products",
+            modelName: "Cart",
+            tableName: "carts",
         }
     );
 
-    return Product;
+    return Cart;
 };

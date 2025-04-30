@@ -1,24 +1,13 @@
-import { Model, DataTypes, Sequelize } from "sequelize";
-import { ProductModel } from "../types/product.type.js";
-import { v4 as uuidv4 } from "uuid";
+import { QueryInterface, DataTypes } from "sequelize";
 
-export default (sequelize: Sequelize) => {
-    class Product extends Model<ProductModel> {
-        static associate(models: any) {
-            Product.belongsTo(models.Category, {
-                foreignKey: "categoryId",
-                as: "category",
-            });
-        }
-    }
-
-    Product.init(
-        {
+export default {
+    up: async (queryInterface: QueryInterface) => {
+        await queryInterface.createTable("products", {
             id: {
                 type: DataTypes.UUID,
-                primaryKey: true,
+                defaultValue: DataTypes.UUIDV4,
                 allowNull: false,
-                defaultValue: uuidv4,
+                primaryKey: true,
             },
             name: {
                 type: DataTypes.STRING,
@@ -32,11 +21,11 @@ export default (sequelize: Sequelize) => {
                 type: DataTypes.UUID,
                 allowNull: false,
                 references: {
-                    model: "categories", // must match your table name
+                    model: "categories",
                     key: "id",
                 },
                 onUpdate: "CASCADE",
-                onDelete: "RESTRICT",
+                onDelete: "CASCADE",
             },
             stock: {
                 type: DataTypes.INTEGER,
@@ -45,20 +34,17 @@ export default (sequelize: Sequelize) => {
             createdAt: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                defaultValue: DataTypes.NOW,
+                defaultValue: new Date(),
             },
             updatedAt: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                defaultValue: DataTypes.NOW,
+                defaultValue: new Date(),
             },
-        },
-        {
-            sequelize,
-            modelName: "Product",
-            tableName: "products",
-        }
-    );
+        });
+    },
 
-    return Product;
+    down: async (queryInterface: QueryInterface) => {
+        await queryInterface.dropTable("products");
+    },
 };

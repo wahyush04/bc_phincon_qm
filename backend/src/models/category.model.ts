@@ -1,18 +1,17 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
-import { ProductModel } from "../types/product.type.js";
 import { v4 as uuidv4 } from "uuid";
 
 export default (sequelize: Sequelize) => {
-    class Product extends Model<ProductModel> {
+    class Category extends Model {
         static associate(models: any) {
-            Product.belongsTo(models.Category, {
+            Category.hasMany(models.Product, {
                 foreignKey: "categoryId",
-                as: "category",
+                as: "products",
             });
         }
     }
 
-    Product.init(
+    Category.init(
         {
             id: {
                 type: DataTypes.UUID,
@@ -20,27 +19,13 @@ export default (sequelize: Sequelize) => {
                 allowNull: false,
                 defaultValue: uuidv4,
             },
-            name: {
+            title: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            price: {
-                type: DataTypes.FLOAT,
-                allowNull: false,
-            },
-            categoryId: {
-                type: DataTypes.UUID,
-                allowNull: false,
-                references: {
-                    model: "categories", // must match your table name
-                    key: "id",
-                },
-                onUpdate: "CASCADE",
-                onDelete: "RESTRICT",
-            },
-            stock: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
+            description: {
+                type: DataTypes.STRING,
+                allowNull: true,
             },
             createdAt: {
                 type: DataTypes.DATE,
@@ -55,10 +40,10 @@ export default (sequelize: Sequelize) => {
         },
         {
             sequelize,
-            modelName: "Product",
-            tableName: "products",
+            modelName: "Category",
+            tableName: "categories",
         }
     );
 
-    return Product;
+    return Category;
 };
