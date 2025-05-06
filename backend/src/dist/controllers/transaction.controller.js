@@ -127,7 +127,7 @@ class TransactionController {
     }
     async getTotalByDate(req, res) {
         try {
-            const { date } = req.query; // expected format: 'YYYY-MM-DD'
+            const { date } = req.query;
             console.log("wahyu --> ", date);
             if (!date) {
                 res.status(400).json({

@@ -11,13 +11,25 @@ class ProductController extends AbstractModel {
                 include: {
                     model: db.Category,
                     as: "category",
-                    attributes: ["id", "name", "description"],
+                    attributes: ["name"],
                 },
+                raw: true,
+                nest: true,
             });
+            
+            const transformedProducts = products.map((product: { id: any; name: any; price: any; stock: any; category: { name: any; }; }) => ({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                stock: product.stock,
+                category: product.category.name
+            }));
+            
+            console.log("wahyu -> ", transformedProducts);
             res.json({
                 status: "success",
                 message: "Products fetched successfully",
-                data: products,
+                data: transformedProducts,
             });
         } catch (error: any) {
             res.json({
@@ -26,7 +38,6 @@ class ProductController extends AbstractModel {
             });
         }
     }
-
     async getById(req: Request, res: Response): Promise<void> {
         try {
             const product = await db.Product.findByPk(req.params.id, {

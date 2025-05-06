@@ -6,10 +6,11 @@ import AuthController from "../controllers/auth.controller.js";
 import categoryRouter from "./category.route.js";
 import transactionRouter from "./transaction.route.js";
 import transactionDetailRouter from "./transaction.detail.route.js";
+import transactionOldRouter from "./transaction.old.route.js";
 
 const router = express.Router();
 
-router.use("/", transactionRouterOld);
+router.use("/transactions-old", transactionOldRouter);
 router.use("/products", productRouter);
 router.use("/categories", categoryRouter);
 router.use("/transactions", transactionRouter);

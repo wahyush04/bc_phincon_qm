@@ -46,9 +46,7 @@ export default function TopNavigationBar({
             </button>
           </div>
 
-          {/* Logo and App Name */}
           <div className="flex items-center">
-            {/* <img className="h-9 w-9 rounded-lg" src={logo} alt="Logo" /> */}
             <Fingerprint className="h-7 w-7 mr-2 text-teal-700" />
             <span className="text-2xl font-bold text-teal-700 tracking-tight">Admin Panel</span>
           </div>
