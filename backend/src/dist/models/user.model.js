@@ -2,12 +2,6 @@ import { Model, DataTypes } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 export default (sequelize) => {
     class User extends Model {
-        static associate(models) {
-            User.hasMany(models.Cart, {
-                foreignKey: "userId",
-                as: "carts",
-            });
-        }
     }
     User.init({
         id: {
@@ -37,7 +31,7 @@ export default (sequelize) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        telephone: {
+        role: {
             type: DataTypes.STRING,
             allowNull: true,
         },

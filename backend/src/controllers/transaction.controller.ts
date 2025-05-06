@@ -1,115 +1,26 @@
 import { Request, Response } from "express";
+import AbstractModel from "../abstracts/model.abstract.js";
 import db from "../models/index.js";
-import CommonModel from "../abstracts/transaction.model.abstract.js";
 import { v4 as uuidv4 } from "uuid";
 
-class TransactionController extends CommonModel {
-    async getAllCategory(req: Request, res: Response): Promise<any> {
+class TransactionController extends AbstractModel {
+    async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const categories = await db.Category.findAll();
-            res.json({
-                status: "success",
-                message: "Categories fetched successfully",
-                data: categories,
-            });
-        } catch (error: any) {
-            res.json({
-                status: "error",
-                message: error.message,
-            });
-        }
-    }
-
-    async getAllProduct(req: Request, res: Response): Promise<any> {
-        try {
-            const products = await db.Product.findAll({
-                include: {
-                    model: db.Category,
-                    as: "category",
-                    attributes: ["id", "title"],
-                },
-            });
-            res.json({
-                status: "success",
-                message: "Products fetched successfully",
-                data: products,
-            });
-        } catch (error: any) {
-            res.json({
-                status: "error",
-                message: error.message,
-            });
-        }
-    }
-
-    async getUserCart(req: Request, res: Response): Promise<any> {
-        try {
-            const { userId } = req.params;
-    
-            const user = await db.User.findByPk(userId, {
+            const transactions = await db.Transaction.findAll({
+                attributes: ["id", "totalPrice", "createdAt"],
                 include: [
                     {
-                        model: db.Cart,
-                        as: "carts",
-                        include: [
-                            {
-                                model: db.Product,
-                                as: "product", // make sure Cart belongsTo Product with alias 'product'
-                                attributes: ["id", "name", "price"],
-                            },
-                        ],
-                    },
+                        model: db.User,
+                        as: "cashier",
+                        attributes: ["id", "username", "email"],
+                    }
                 ],
-                attributes: ["id", "name", "email"], // optional
-            });
-    
-            if (!user) {
-                return res.status(404).json({
-                    status: "error",
-                    message: "User not found",
-                });
-            }
-    
-            // Calculate total price
-            const carts = user.carts.map((cart: any) => {
-                const totalPrice = cart.qty * cart.product.price;
-                return {
-                    ...cart.toJSON(),
-                    product: cart.product,
-                    totalPrice,
-                };
-            });
-    
-            res.json({
-                status: "success",
-                message: "Cart fetched successfully",
-                data: carts,
-            });
-        } catch (error: any) {
-            res.json({
-                status: "error",
-                message: error.message,
-            });
-        }
-    }
-    
-    async addCart(req: Request, res: Response): Promise<any> {
-        try {
-            const { userId } = req.params;
-            const { productId, qty } = req.body;
-
-            const cartItem = await db.Cart.create({
-                id: uuidv4(),
-                userId,
-                productId,
-                qty,
-                totalPrice: qty * (await db.Product.findByPk(productId)).price
             });
 
             res.json({
                 status: "success",
-                message: "Cart item added successfully",
-                data: cartItem,
+                message: "Transactions fetched successfully",
+                data: transactions,
             });
         } catch (error: any) {
             res.json({
@@ -119,30 +30,111 @@ class TransactionController extends CommonModel {
         }
     }
 
-    async deleteCart(req: Request, res: Response): Promise<any> {
+    async getById(req: Request, res: Response): Promise<void> {
         try {
-            const { cartId } = req.params;
-            const deleted = await db.Cart.destroy({ where: { id: cartId } });
-    
-            if (deleted) {
-                return res.json({
-                    status: "success",
-                    message: "Cart item deleted successfully",
-                });
-            } else {
-                return res.status(404).json({
+            const transaction = await db.Transaction.findByPk(req.params.id, {
+                attributes: ["id", "totalPrice", "createdAt"],
+                include: [
+                    {
+                        model: db.User,
+                        as: "cashier",
+                        attributes: ["id", "username", "email"],
+                    }
+                ],
+            });
+
+            if (!transaction) {
+                res.json({
                     status: "error",
-                    message: "Cart item not found",
+                    message: "Transaction not found",
                 });
+                return;
             }
+
+            res.json({
+                status: "success",
+                message: "Transaction fetched successfully",
+                data: transaction,
+            });
         } catch (error: any) {
-            return res.status(500).json({
+            res.json({
                 status: "error",
                 message: error.message,
             });
         }
     }
-    
+
+    async create(req: Request, res: Response): Promise<void> {
+        try {
+            const id = req.body.id || uuidv4();
+            const transaction = await db.Transaction.create({
+                ...req.body,
+                id,
+            });
+
+            res.json({
+                status: "success",
+                message: "Transaction created successfully",
+                data: transaction,
+            });
+        } catch (error: any) {
+            res.json({
+                status: "error",
+                message: error.message,
+            });
+        }
+    }
+
+    async update(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+            const [updated] = await db.Transaction.update(req.body, { where: { id } });
+
+            if (!updated) {
+                res.json({
+                    status: "error",
+                    message: "Transaction not found or no changes applied",
+                });
+                return;
+            }
+
+            res.json({
+                status: "success",
+                message: "Transaction updated successfully",
+            });
+        } catch (error: any) {
+            res.json({
+                status: "error",
+                message: error.message,
+            });
+        }
+    }
+
+    async delete(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+            const deleted = await db.Transaction.destroy({ where: { id } });
+
+            if (!deleted) {
+                res.json({
+                    status: "error",
+                    message: "Transaction not found",
+                });
+                return;
+            }
+
+            res.json({
+                status: "success",
+                message: "Transaction deleted successfully",
+                data: id,
+            });
+        } catch (error: any) {
+            res.json({
+                status: "error",
+                message: error.message,
+            });
+        }
+    }
 }
 
 export default new TransactionController();

@@ -11,7 +11,7 @@ class ProductController extends AbstractModel {
                 include: {
                     model: db.Category,
                     as: "category",
-                    attributes: ["id", "title"],
+                    attributes: ["id", "name", "description"],
                 },
             });
             res.json({
@@ -34,7 +34,7 @@ class ProductController extends AbstractModel {
                 include: {
                     model: db.Category,
                     as: "category",
-                    attributes: ["id", "title"],
+                    attributes: ["id", "name", "description"],
                 },
             });
             if (!product) {
@@ -82,6 +82,7 @@ class ProductController extends AbstractModel {
         try {
             const { id } = req.params;
             const [updated] = await db.Product.update(req.body, { where: { id } });
+            
             if (!updated) {
                 res.json({
                     status: "error",

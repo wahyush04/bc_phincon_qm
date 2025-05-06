@@ -9,7 +9,7 @@ class ProductController extends AbstractModel {
                 include: {
                     model: db.Category,
                     as: "category",
-                    attributes: ["id", "title"],
+                    attributes: ["id", "name", "description"],
                 },
             });
             res.json({
@@ -32,7 +32,7 @@ class ProductController extends AbstractModel {
                 include: {
                     model: db.Category,
                     as: "category",
-                    attributes: ["id", "title"],
+                    attributes: ["id", "name", "description"],
                 },
             });
             if (!product) {

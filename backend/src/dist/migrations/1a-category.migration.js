@@ -8,7 +8,7 @@ export default {
                 allowNull: false,
                 primaryKey: true,
             },
-            title: {
+            name: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },

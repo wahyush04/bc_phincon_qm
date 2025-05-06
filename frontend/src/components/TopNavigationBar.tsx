@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import logo from "../assets/logo.webp";
-import { Menu } from "lucide-react";
+import { Fingerprint, Menu } from "lucide-react";
 
 export default function TopNavigationBar({
   onTabChange,
@@ -47,9 +47,10 @@ export default function TopNavigationBar({
           </div>
 
           {/* Logo and App Name */}
-          <div className="flex items-center gap-3">
-            <img className="h-9 w-9 rounded-lg" src={logo} alt="Logo" />
-            <span className="text-2xl font-bold text-teal-700 tracking-tight">MyApp</span>
+          <div className="flex items-center">
+            {/* <img className="h-9 w-9 rounded-lg" src={logo} alt="Logo" /> */}
+            <Fingerprint className="h-7 w-7 mr-2 text-teal-700" />
+            <span className="text-2xl font-bold text-teal-700 tracking-tight">Admin Panel</span>
           </div>
 
           {/* Desktop nav */}

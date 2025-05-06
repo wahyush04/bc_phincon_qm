@@ -17,6 +17,10 @@ export default {
                 type: DataTypes.FLOAT,
                 allowNull: false,
             },
+            stock: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            },
             categoryId: {
                 type: DataTypes.UUID,
                 allowNull: false,
@@ -26,10 +30,6 @@ export default {
                 },
                 onUpdate: "CASCADE",
                 onDelete: "CASCADE",
-            },
-            stock: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
             },
             createdAt: {
                 type: DataTypes.DATE,

@@ -1,8 +1,9 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
+import { CategoryModel } from "src/types/category.type";
 import { v4 as uuidv4 } from "uuid";
 
 export default (sequelize: Sequelize) => {
-    class Category extends Model {
+    class Category extends Model<CategoryModel> {
         static associate(models: any) {
             Category.hasMany(models.Product, {
                 foreignKey: "categoryId",
@@ -19,7 +20,7 @@ export default (sequelize: Sequelize) => {
                 allowNull: false,
                 defaultValue: uuidv4,
             },
-            title: {
+            name: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },

@@ -16,7 +16,7 @@ export default (sequelize) => {
             allowNull: false,
             defaultValue: uuidv4,
         },
-        title: {
+        name: {
             type: DataTypes.STRING,
             allowNull: false,
         },

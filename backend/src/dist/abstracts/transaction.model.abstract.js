@@ -1,2 +1,2 @@
-export default class CommonModel {
+export default class TransactionModelAbstract {
 }

@@ -1,11 +1,12 @@
 import { QueryInterface, DataTypes } from "sequelize";
+import { v4 as UUIDV4 } from "uuid";
 
 export default {
   up: async (queryInterface: QueryInterface) => {
     await queryInterface.createTable("users", {
       id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: UUIDV4(),
         allowNull: false,
         primaryKey: true,
       },
@@ -27,9 +28,9 @@ export default {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      teleohone: {
-        type: DataTypes.STRING,
-        allowNull: true,
+      role: {
+        type: DataTypes.ENUM("admin", "cashier"),
+        allowNull: false,
       },
       createdAt: {
         type: DataTypes.DATE,

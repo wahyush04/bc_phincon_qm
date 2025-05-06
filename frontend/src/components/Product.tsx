@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from "../features/products/product.slice";
-import { PlusCircle, Edit, Trash2, X, Check, Loader } from "lucide-react";
+import { PlusCircle, Edit, Trash2, X, Check, Loader, FileText } from "lucide-react";
 import { ProductType } from "../types/product.type";
 import toast from 'react-hot-toast'
 
@@ -20,6 +20,7 @@ const Product = () => {
     category: "",
     data: {}
   });
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   useEffect(() => {
     dispatch(getAllProducts() as any);
@@ -37,6 +38,12 @@ const Product = () => {
     setEditingId(null);
   };
 
+  // TODO: detail modal
+  const handleDetailModal = (product: ProductType) => {
+    setIsDetailOpen(true)
+    setFormData(product);
+  };
+
   const handleOpenForm = (product: ProductType | null = null) => {
     if (product) {
       setFormData(product);
@@ -51,6 +58,10 @@ const Product = () => {
     setIsFormOpen(false);
     resetForm();
   };
+
+  const handleCloseDetail = () => {
+    setIsDetailOpen(false)
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -146,15 +157,18 @@ const Product = () => {
                   <td className="px-5 py-4 text-sm text-gray-900">{product.category}</td>
                   <td className="px-5 py-4 text-right space-x-3">
                     <button
+                      onClick={() => handleDetailModal(product)}
+                      className="text-blue-500 hover:text-blue-800 transition-colors">
+                      <FileText className="h-5 w-5" />
+                    </button>
+                    <button
                       onClick={() => handleOpenForm(product)}
-                      className="text-teal-600 hover:text-teal-800 transition-colors"
-                    >
+                      className="text-teal-600 hover:text-teal-800 transition-colors">
                       <Edit className="h-5 w-5" />
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
-                      className="text-red-500 hover:text-red-700 transition-colors"
-                    >
+                      className="text-red-500 hover:text-red-700 transition-colors">
                       <Trash2 className="h-5 w-5" />
                     </button>
                   </td>
@@ -169,8 +183,52 @@ const Product = () => {
         </div>
       )}
 
+      {isDetailOpen && (
+        <div className="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
+                    <FileText className="h-10 w-10" />
+                  </div>
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 className="text-base font-semibold text-gray-900" id="modal-title">{formData.name}</h3>
+                    <div className="mt-2 space-y-1 text-sm text-gray-500">
+                      <p><strong>ID:</strong> {formData.id}</p>
+                      <p><strong>Price:</strong> ${formData.price}</p>
+                      <p><strong>Stock:</strong> {formData.stock}</p>
+                      <p><strong>Category:</strong> {formData.category}</p>
+                      {formData.data && Object.keys(formData.data).length > 0 && (
+                        <div>
+                          <p className="mt-2 font-semibold text-gray-700">Additional Details:</p>
+                          <ul className="list-disc list-inside text-sm">
+                            {Object.entries(formData.data).map(([key, value]) => (
+                              <li key={key}><strong>{key}:</strong> {String(value)}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <button onClick={handleCloseDetail} type="button" className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      )}
+
       {isFormOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-gray-900">

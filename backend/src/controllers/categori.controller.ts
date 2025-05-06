@@ -7,7 +7,7 @@ class CategoryController extends AbstractModel {
     async getAll(req: Request, res: Response): Promise<void> {
         try {
             const categories = await db.Category.findAll({
-                attributes: ["id", "title", "description", "createdAt", "updatedAt"],
+                attributes: ["id", "name", "description", "createdAt", "updatedAt"],
             });
             res.json({
                 status: "success",
@@ -25,7 +25,7 @@ class CategoryController extends AbstractModel {
     async getById(req: Request, res: Response): Promise<void> {
         try {
             const category = await db.Category.findByPk(req.params.id, {
-                attributes: ["id", "title", "description", "createdAt", "updatedAt"],
+                attributes: ["id", "name", "description", "createdAt", "updatedAt"],
             });
             if (!category) {
                 res.json({
@@ -60,7 +60,7 @@ class CategoryController extends AbstractModel {
                 message: "Category created successfully",
                 data: {
                     id: category.id,
-                    title: category.title,
+                    name: category.name,
                     description: category.description,
                     createdAt: category.createdAt,
                     updatedAt: category.updatedAt,
@@ -78,7 +78,7 @@ class CategoryController extends AbstractModel {
         try {
             const { id } = req.params;
             const [updated] = await db.Category.update(req.body, { where: { id } });
-
+            
             if (!updated) {
                 res.json({
                     status: "error",
