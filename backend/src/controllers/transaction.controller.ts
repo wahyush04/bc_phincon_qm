@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import AbstractModel from "../abstracts/model.abstract.js";
 import db from "../models/index.js";
 import { v4 as uuidv4 } from "uuid";
+import { Op } from "sequelize";
 
-class TransactionController extends AbstractModel {
+class TransactionController {
     async getAll(req: Request, res: Response): Promise<void> {
         try {
             const transactions = await db.Transaction.findAll({
@@ -135,6 +135,54 @@ class TransactionController extends AbstractModel {
             });
         }
     }
+
+    async getTotalByDate(req: Request, res: Response): Promise<void> {
+        try {
+            const { date } = req.query;
+            console.log("wahyu --> ", date);
+            if (!date) {
+                res.status(400).json({
+                    status: "error",
+                    message: "Query parameter 'date' is required in 'YYYY-MM-DD' format",
+                });
+                return;
+            }
+
+            const [totalResult, totalTransactions] = await Promise.all([
+                db.Transaction.findAll({
+                    attributes: [
+                        [db.sequelize.fn("SUM", db.sequelize.col("totalPrice")), "totalPrice"]
+                    ],
+                    where: db.sequelize.where(
+                        db.sequelize.fn("DATE", db.sequelize.col("createdAt")),
+                        date
+                    )
+                }),
+                db.Transaction.count({
+                    where: db.sequelize.where(
+                        db.sequelize.fn("DATE", db.sequelize.col("createdAt")),
+                        date
+                    )
+                })
+            ]);
+            console
+
+            res.json({
+                status: "success",
+                message: `Total transactions on ${date} fetched successfully`,
+                data: {
+                    totalPrice: totalResult[0].totalPrice,
+                    totalTransactions,
+                },
+            });
+        } catch (error: any) {
+            res.status(500).json({
+                status: "error",
+                message: error.message,
+            });
+        }
+    }
+
 }
 
 export default new TransactionController();

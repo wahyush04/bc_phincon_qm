@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 class TransactionDetailController extends AbstractModel {
     async getAll(req, res) {
         try {
+            // Raw Query
             // const [transactionDetails] = await db.sequelize.query(`
             //     SELECT 
             //         td.id AS id,
@@ -98,12 +99,11 @@ class TransactionDetailController extends AbstractModel {
             await t.commit(); // commit transaction
             res.json({
                 status: "success",
-                message: "Transaction detail created and stock updated successfully",
-                data: detail,
+                message: "Transaction detail created and stock updated successfully"
             });
         }
         catch (error) {
-            await t.rollback(); // rollback on error
+            await t.rollback();
             res.json({
                 status: "error",
                 message: error.message,

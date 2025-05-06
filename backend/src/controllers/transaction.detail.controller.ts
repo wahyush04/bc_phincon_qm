@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 class TransactionDetailController extends AbstractModel {
     async getAll(req: Request, res: Response): Promise<void> {
         try {
+            // Raw Query
             // const [transactionDetails] = await db.sequelize.query(`
             //     SELECT 
             //         td.id AS id,
